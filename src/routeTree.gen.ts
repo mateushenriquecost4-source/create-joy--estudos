@@ -10,12 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CoachRouteImport } from './routes/coach'
 import { Route as EditalRouteImport } from './routes/edital'
+import { Route as PlanejamentoRouteImport } from './routes/planejamento'
 import { Route as QuestoesRouteImport } from './routes/questoes'
+import { Route as SimuladosRouteImport } from './routes/simulados'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoachRoute = CoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EditalRoute = EditalRouteImport.update({
@@ -23,40 +31,70 @@ const EditalRoute = EditalRouteImport.update({
   path: '/edital',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlanejamentoRoute = PlanejamentoRouteImport.update({
+  id: '/planejamento',
+  path: '/planejamento',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuestoesRoute = QuestoesRouteImport.update({
   id: '/questoes',
   path: '/questoes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SimuladosRoute = SimuladosRouteImport.update({
+  id: '/simulados',
+  path: '/simulados',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/coach': typeof CoachRoute
   '/edital': typeof EditalRoute
+  '/planejamento': typeof PlanejamentoRoute
   '/questoes': typeof QuestoesRoute
+  '/simulados': typeof SimuladosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/coach': typeof CoachRoute
   '/edital': typeof EditalRoute
+  '/planejamento': typeof PlanejamentoRoute
   '/questoes': typeof QuestoesRoute
+  '/simulados': typeof SimuladosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/coach': typeof CoachRoute
   '/edital': typeof EditalRoute
+  '/planejamento': typeof PlanejamentoRoute
   '/questoes': typeof QuestoesRoute
+  '/simulados': typeof SimuladosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/edital' | '/questoes'
+  fullPaths:
+    '/' | '/coach' | '/edital' | '/planejamento' | '/questoes' | '/simulados'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/edital' | '/questoes'
-  id: '__root__' | '/' | '/edital' | '/questoes'
+  to: '/' | '/coach' | '/edital' | '/planejamento' | '/questoes' | '/simulados'
+  id:
+    | '__root__'
+    | '/'
+    | '/coach'
+    | '/edital'
+    | '/planejamento'
+    | '/questoes'
+    | '/simulados'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CoachRoute: typeof CoachRoute
   EditalRoute: typeof EditalRoute
+  PlanejamentoRoute: typeof PlanejamentoRoute
   QuestoesRoute: typeof QuestoesRoute
+  SimuladosRoute: typeof SimuladosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,11 +106,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/coach': {
+      id: '/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof CoachRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/edital': {
       id: '/edital'
       path: '/edital'
       fullPath: '/edital'
       preLoaderRoute: typeof EditalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/planejamento': {
+      id: '/planejamento'
+      path: '/planejamento'
+      fullPath: '/planejamento'
+      preLoaderRoute: typeof PlanejamentoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/questoes': {
@@ -82,13 +134,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuestoesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/simulados': {
+      id: '/simulados'
+      path: '/simulados'
+      fullPath: '/simulados'
+      preLoaderRoute: typeof SimuladosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CoachRoute: CoachRoute,
   EditalRoute: EditalRoute,
+  PlanejamentoRoute: PlanejamentoRoute,
   QuestoesRoute: QuestoesRoute,
+  SimuladosRoute: SimuladosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
