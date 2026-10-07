@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EditalRouteImport } from './routes/edital'
+import { Route as QuestoesRouteImport } from './routes/questoes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EditalRoute = EditalRouteImport.update({
+  id: '/edital',
+  path: '/edital',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuestoesRoute = QuestoesRouteImport.update({
+  id: '/questoes',
+  path: '/questoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/edital': typeof EditalRoute
+  '/questoes': typeof QuestoesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/edital': typeof EditalRoute
+  '/questoes': typeof QuestoesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/edital': typeof EditalRoute
+  '/questoes': typeof QuestoesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/edital' | '/questoes'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/edital' | '/questoes'
+  id: '__root__' | '/' | '/edital' | '/questoes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EditalRoute: typeof EditalRoute
+  QuestoesRoute: typeof QuestoesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/edital': {
+      id: '/edital'
+      path: '/edital'
+      fullPath: '/edital'
+      preLoaderRoute: typeof EditalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/questoes': {
+      id: '/questoes'
+      path: '/questoes'
+      fullPath: '/questoes'
+      preLoaderRoute: typeof QuestoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EditalRoute: EditalRoute,
+  QuestoesRoute: QuestoesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
