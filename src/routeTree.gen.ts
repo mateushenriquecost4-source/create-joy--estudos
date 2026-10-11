@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CoachRouteImport } from './routes/coach'
 import { Route as EditalRouteImport } from './routes/edital'
+import { Route as EstatisticasRouteImport } from './routes/estatisticas'
+import { Route as FaculdadeRouteImport } from './routes/faculdade'
 import { Route as PlanejamentoRouteImport } from './routes/planejamento'
 import { Route as QuestoesRouteImport } from './routes/questoes'
 import { Route as SimuladosRouteImport } from './routes/simulados'
@@ -29,6 +31,16 @@ const CoachRoute = CoachRouteImport.update({
 const EditalRoute = EditalRouteImport.update({
   id: '/edital',
   path: '/edital',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EstatisticasRoute = EstatisticasRouteImport.update({
+  id: '/estatisticas',
+  path: '/estatisticas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaculdadeRoute = FaculdadeRouteImport.update({
+  id: '/faculdade',
+  path: '/faculdade',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlanejamentoRoute = PlanejamentoRouteImport.update({
@@ -51,6 +63,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/coach': typeof CoachRoute
   '/edital': typeof EditalRoute
+  '/estatisticas': typeof EstatisticasRoute
+  '/faculdade': typeof FaculdadeRoute
   '/planejamento': typeof PlanejamentoRoute
   '/questoes': typeof QuestoesRoute
   '/simulados': typeof SimuladosRoute
@@ -59,6 +73,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/coach': typeof CoachRoute
   '/edital': typeof EditalRoute
+  '/estatisticas': typeof EstatisticasRoute
+  '/faculdade': typeof FaculdadeRoute
   '/planejamento': typeof PlanejamentoRoute
   '/questoes': typeof QuestoesRoute
   '/simulados': typeof SimuladosRoute
@@ -68,6 +84,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/coach': typeof CoachRoute
   '/edital': typeof EditalRoute
+  '/estatisticas': typeof EstatisticasRoute
+  '/faculdade': typeof FaculdadeRoute
   '/planejamento': typeof PlanejamentoRoute
   '/questoes': typeof QuestoesRoute
   '/simulados': typeof SimuladosRoute
@@ -75,14 +93,31 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/coach' | '/edital' | '/planejamento' | '/questoes' | '/simulados'
+    | '/'
+    | '/coach'
+    | '/edital'
+    | '/estatisticas'
+    | '/faculdade'
+    | '/planejamento'
+    | '/questoes'
+    | '/simulados'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/coach' | '/edital' | '/planejamento' | '/questoes' | '/simulados'
+  to:
+    | '/'
+    | '/coach'
+    | '/edital'
+    | '/estatisticas'
+    | '/faculdade'
+    | '/planejamento'
+    | '/questoes'
+    | '/simulados'
   id:
     | '__root__'
     | '/'
     | '/coach'
     | '/edital'
+    | '/estatisticas'
+    | '/faculdade'
     | '/planejamento'
     | '/questoes'
     | '/simulados'
@@ -92,6 +127,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CoachRoute: typeof CoachRoute
   EditalRoute: typeof EditalRoute
+  EstatisticasRoute: typeof EstatisticasRoute
+  FaculdadeRoute: typeof FaculdadeRoute
   PlanejamentoRoute: typeof PlanejamentoRoute
   QuestoesRoute: typeof QuestoesRoute
   SimuladosRoute: typeof SimuladosRoute
@@ -118,6 +155,20 @@ declare module '@tanstack/react-router' {
       path: '/edital'
       fullPath: '/edital'
       preLoaderRoute: typeof EditalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estatisticas': {
+      id: '/estatisticas'
+      path: '/estatisticas'
+      fullPath: '/estatisticas'
+      preLoaderRoute: typeof EstatisticasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faculdade': {
+      id: '/faculdade'
+      path: '/faculdade'
+      fullPath: '/faculdade'
+      preLoaderRoute: typeof FaculdadeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/planejamento': {
@@ -148,6 +199,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CoachRoute: CoachRoute,
   EditalRoute: EditalRoute,
+  EstatisticasRoute: EstatisticasRoute,
+  FaculdadeRoute: FaculdadeRoute,
   PlanejamentoRoute: PlanejamentoRoute,
   QuestoesRoute: QuestoesRoute,
   SimuladosRoute: SimuladosRoute,
