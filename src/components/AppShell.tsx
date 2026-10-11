@@ -1,15 +1,23 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { LayoutDashboard, ListChecks, Target, Bot, CalendarDays, Trophy, ChevronsLeft, Menu, Shield, X } from "lucide-react";
+import { LayoutDashboard, ListChecks, Target, Bot, CalendarDays, Trophy, ChevronsLeft, Menu, Shield, X, BarChart3, GraduationCap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const nav = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/edital", label: "Edital Verticalizado", icon: ListChecks },
-  { to: "/questoes", label: "Central de Questões", icon: Target },
-  { to: "/coach", label: "PRF AI Coach", icon: Bot },
-  { to: "/planejamento", label: "Planejamento", icon: CalendarDays },
-  { to: "/simulados", label: "Simulados & TAF", icon: Trophy },
+const groups = [
+  { title: "", items: [
+    { to: "/", label: "Hoje", icon: LayoutDashboard },
+    { to: "/estatisticas", label: "Estatísticas", icon: BarChart3 },
+    { to: "/coach", label: "AI Coach", icon: Bot },
+  ] },
+  { title: "🛡️ Concurso PRF", items: [
+    { to: "/edital", label: "Edital Verticalizado", icon: ListChecks },
+    { to: "/questoes", label: "Central de Questões", icon: Target },
+    { to: "/planejamento", label: "Planejamento", icon: CalendarDays },
+    { to: "/simulados", label: "Simulados & TAF", icon: Trophy },
+  ] },
+  { title: "🎓 Tecnólogo", items: [
+    { to: "/faculdade", label: "Gestão Financeira (Graduação)", icon: GraduationCap },
+  ] },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -18,8 +26,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   const items = (
-    <nav className="flex flex-col gap-1 p-3">
-      {nav.map((n) => {
+    <nav className="flex flex-col gap-5 p-3">
+      {groups.map((g) => (
+      <div key={g.title} className="flex flex-col gap-1">
+      {g.title && !collapsed && <div className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/70">{g.title}</div>}
+      {g.title && collapsed && <div className="mx-3 mb-1 border-t border-sidebar-border" />}
+      {g.items.map((n) => {
         const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
         return (
           <Link key={n.to} to={n.to} onClick={() => setOpen(false)} title={n.label}
@@ -30,6 +42,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
         );
       })}
+      </div>
+      ))}
     </nav>
   );
 
@@ -65,7 +79,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <button onClick={() => setOpen(true)}><Menu className="size-5" /></button>
           <span className="font-display text-lg font-bold tracking-wider">PRF · OPS</span>
         </header>
-        <main className="mx-auto max-w-7xl p-4 md:p-8">{children}</main>
+        <main className="mx-auto max-w-6xl px-5 py-8 md:px-10 md:py-12">{children}</main>
       </div>
     </div>
   );
@@ -73,7 +87,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 export function PageHeader({ title, subtitle, children }: { title: string; subtitle?: string; children?: ReactNode }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
       <div>
         <h1 className="text-3xl font-bold uppercase md:text-4xl">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
@@ -85,10 +99,10 @@ export function PageHeader({ title, subtitle, children }: { title: string; subti
 
 export function Panel({ title, icon: Icon, action, className, children }: { title?: string; icon?: React.ComponentType<{ className?: string }>; action?: ReactNode; className?: string; children: ReactNode }) {
   return (
-    <section className={cn("glass p-5", className)}>
+    <section className={cn("glass p-6", className)}>
       {title && (
-        <div className="mb-4 flex items-center justify-between gap-2">
-          <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+        <div className="mb-5 flex items-center justify-between gap-2">
+          <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             {Icon && <Icon className="size-4 text-primary" />}{title}
           </h2>
           {action}

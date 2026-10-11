@@ -10,8 +10,16 @@ export type CalEvent = { id: string; day: number; title: string; kind: "Estudo" 
 export type Simulado = { id: string; date: string; name: string; certas: number; erradas: number; brancos: number; redacao: number; posicao: number };
 export type TafTest = { id: string; name: string; unit: string; goal: number; current: number; higherBetter: boolean };
 
+export type DiscStatus = "A Fazer" | "Em andamento" | "Concluída";
+export type Assessment = { id: string; title: string; kind: "Trabalho" | "Atividade Prática" | "Prova"; due: string; grade: number | null; submitted: boolean };
+export type Discipline = { id: string; name: string; semester: 1 | 2 | 3; module: number; status: DiscStatus; assessments: Assessment[] };
+export type CourseLink = { id: string; label: string; url: string; kind: "Aula" | "PDF" | "Portal" };
+export type Faculdade = { startDate: string; months: number; disciplines: Discipline[]; links: CourseLink[] };
+
 export type State = {
   examDate: string;
+  dailyGoalMin: number;
+  faculdade: Faculdade;
   subjects: Subject[];
   sessions: Session[];
   batteries: Battery[];
@@ -38,6 +46,43 @@ const raw: [string, string, number, number, string[]][] = [
   ["Direito Processual Penal", "PPENAL", 2, 3, ["Inquérito policial", "Ação penal", "Prisões e liberdade provisória", "Provas", "Abuso de autoridade"]],
   ["Geopolítica", "GEO", 1, 2, ["Malha rodoviária brasileira", "Fronteiras e regiões", "Geopolítica mundial", "Integração econômica"]],
 ];
+
+function seedFaculdade(): Faculdade {
+  const d: [string, 1 | 2 | 3, number, DiscStatus][] = [
+    ["Fundamentos de Administração", 1, 1, "Concluída"], ["Matemática Financeira", 1, 1, "Concluída"], ["Contabilidade Básica", 1, 2, "Concluída"], ["Economia", 1, 2, "Concluída"],
+    ["Análise das Demonstrações Contábeis", 2, 1, "Concluída"], ["Gestão de Custos", 2, 1, "Em andamento"], ["Estatística Aplicada", 2, 2, "Em andamento"], ["Mercado Financeiro e de Capitais", 2, 2, "A Fazer"],
+    ["Orçamento Empresarial", 3, 1, "A Fazer"], ["Administração Financeira", 3, 1, "A Fazer"], ["Planejamento Tributário", 3, 2, "A Fazer"], ["Projeto Integrador", 3, 2, "A Fazer"],
+  ];
+  const day = (n: number) => { const x = new Date(); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
+  return {
+    startDate: "2026-02-02", months: 18,
+    disciplines: d.map(([name, semester, module, status], i) => ({
+      id: `d${i}`, name, semester, module, status,
+      assessments: status === "Concluída"
+        ? [{ id: `d${i}a`, title: "Atividade prática", kind: "Atividade Prática", due: day(-60 - i * 10), grade: 7 + ((i * 3) % 3), submitted: true }, { id: `d${i}b`, title: "Prova final", kind: "Prova", due: day(-45 - i * 10), grade: 6.5 + ((i * 7) % 4) * 0.8, submitted: true }]
+        : status === "Em andamento"
+          ? [{ id: `d${i}a`, title: "Trabalho individual", kind: "Trabalho", due: day(3 + i), grade: null, submitted: false }, { id: `d${i}b`, title: "Prova N1", kind: "Prova", due: day(12 + i), grade: null, submitted: false }]
+          : [],
+    })),
+    links: [
+      { id: "l1", label: "Portal do Aluno", url: "https://", kind: "Portal" },
+      { id: "l2", label: "Aulas gravadas – Gestão de Custos", url: "https://", kind: "Aula" },
+      { id: "l3", label: "Apostila Estatística (PDF)", url: "https://", kind: "PDF" },
+    ],
+  };
+}
+
+export function courseProgress(f: Faculdade, now = new Date()) {
+  const start = new Date(f.startDate + "T00:00:00");
+  const end = new Date(start); end.setMonth(end.getMonth() + f.months);
+  const elapsed = Math.min(1, Math.max(0, (now.getTime() - start.getTime()) / (end.getTime() - start.getTime())));
+  const monthsLeft = Math.max(0, (end.getFullYear() - now.getFullYear()) * 12 + end.getMonth() - now.getMonth());
+  return { pct: Math.round(elapsed * 100), monthsLeft, end };
+}
+export function gpa(f: Faculdade) {
+  const g = f.disciplines.flatMap((d) => d.assessments).map((a) => a.grade).filter((x): x is number => x !== null);
+  return g.length ? +(g.reduce((a, b) => a + b, 0) / g.length).toFixed(2) : 0;
+}
 
 function seed(): State {
   let s = 7;
@@ -70,6 +115,8 @@ function seed(): State {
   const exam = new Date(); exam.setDate(exam.getDate() + 118);
   return {
     examDate: exam.toISOString().slice(0, 10),
+    dailyGoalMin: 240,
+    faculdade: seedFaculdade(),
     subjects, sessions, batteries,
     notes: [
       { id: uid(), date: new Date().toISOString(), subjectId: "s6", text: "Art. 165 CTB: recusa ao bafômetro (165-A) tem a MESMA penalidade da embriaguez — gravíssima x10, suspensão 12 meses." },
@@ -111,7 +158,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const v = localStorage.getItem(KEY);
-      if (v) setState(JSON.parse(v));
+      if (v) setState({ ...seed(), ...JSON.parse(v) });
     } catch { /* ignore */ }
     loaded.current = true;
   }, []);
