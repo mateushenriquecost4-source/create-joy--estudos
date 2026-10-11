@@ -6,6 +6,7 @@ import { PageHeader, Panel } from "@/components/AppShell";
 import { useStore, uid } from "@/lib/store";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/simulados")({
   head: () => ({
@@ -27,7 +28,10 @@ function Simulados() {
   return (
     <>
       <PageHeader title="Simulados & TAF" subtitle="Padrão Cebraspe: uma errada anula uma certa" />
-      <div className="grid gap-4 lg:grid-cols-3">
+      <Tabs defaultValue="sim">
+        <TabsList className="mb-6"><TabsTrigger value="sim">Simulados Cebraspe</TabsTrigger><TabsTrigger value="taf">Teste de Aptidão Física (TAF)</TabsTrigger></TabsList>
+        <TabsContent value="sim">
+      <div className="grid gap-6 lg:grid-cols-3">
         <Panel title="Novo simulado" icon={Plus}>
           <form className="space-y-2" onSubmit={(e) => { e.preventDefault(); set((s) => ({ ...s, simulados: [...s.simulados, { id: uid(), ...f, name: f.name || "Simulado" }] })); setF({ ...f, name: "", certas: 0, erradas: 0, brancos: 0 }); }}>
             <Input placeholder="Nome do simulado" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} className="bg-secondary" />
@@ -71,27 +75,24 @@ function Simulados() {
         </Panel>
       </div>
 
-      <Panel title="Controle de TAF" icon={Dumbbell} className="mt-4">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        </TabsContent>
+        <TabsContent value="taf">
+        <div className="glass divide-y divide-border">
           {state.taf.map((t) => {
             const ok = t.higherBetter ? t.current >= t.goal : t.current <= t.goal;
             const upd = (k: "goal" | "current", v: number) => set((s) => ({ ...s, taf: s.taf.map((x) => x.id === t.id ? { ...x, [k]: v } : x) }));
             return (
-              <div key={t.id} className={cn("rounded-xl border p-4", ok ? "border-success/40 bg-success/10" : "border-destructive/40 bg-destructive/10")}>
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-sm font-semibold">{t.name}</span>
-                  <span className={cn("rounded px-2 py-0.5 text-[10px] font-bold uppercase", ok ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground")}>{ok ? "Aprovado" : "Reprovado"}</span>
-                </div>
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <label className="text-[11px] text-muted-foreground">Atual ({t.unit})<Input type="number" step="0.01" value={t.current} onChange={(e) => upd("current", +e.target.value)} className="mt-1 h-8 bg-secondary tabular" /></label>
-                  <label className="text-[11px] text-muted-foreground">Meta ({t.unit})<Input type="number" step="0.01" value={t.goal} onChange={(e) => upd("goal", +e.target.value)} className="mt-1 h-8 bg-secondary tabular" /></label>
-                </div>
-                <p className="mt-2 text-[11px] text-muted-foreground">{t.higherBetter ? "Mínimo exigido" : "Tempo máximo"}</p>
+              <div key={t.id} className="flex flex-wrap items-center gap-4 px-5 py-4">
+                <div className="min-w-40 flex-1"><div className="font-medium">{t.name}</div><div className="text-xs text-muted-foreground">{t.higherBetter ? "Mínimo" : "Máximo"} {t.goal} {t.unit}</div></div>
+                <label className="flex items-center gap-2 text-xs text-muted-foreground">Atual<Input type="number" step="0.01" value={t.current} onChange={(e) => upd("current", +e.target.value)} className="h-8 w-20 bg-secondary tabular" /></label>
+                <label className="flex items-center gap-2 text-xs text-muted-foreground">Meta<Input type="number" step="0.01" value={t.goal} onChange={(e) => upd("goal", +e.target.value)} className="h-8 w-20 bg-secondary tabular" /></label>
+                <span className={cn("w-24 rounded-full px-3 py-1 text-center text-xs font-medium", ok ? "bg-success/15 text-success" : "bg-destructive/15 text-destructive")}>{ok ? "Aprovado" : "Reprovado"}</span>
               </div>
             );
           })}
         </div>
-      </Panel>
+        </TabsContent>
+      </Tabs>
     </>
   );
 }

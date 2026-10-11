@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/questoes")({
   head: () => ({
@@ -39,7 +40,15 @@ function Questoes() {
   return (
     <>
       <PageHeader title="Central de Questões" subtitle="Qconcursos · Tec Concursos · Cebraspe" />
-      <div className="grid gap-4 lg:grid-cols-3">
+      {weak.length > 0 && (
+        <div className="mb-8 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm">
+          <AlertTriangle className="size-4 text-warning" /><span className="font-medium">Abaixo de 70%:</span>
+          {weak.slice(0, 4).map((w) => <span key={w.sid + w.topic} className="text-muted-foreground">{name(w.sid)} · {w.topic} <strong className="tabular text-warning">{pct(w.c, w.t)}%</strong></span>)}
+        </div>
+      )}
+      <Tabs defaultValue="registrar">
+        <TabsList className="mb-6"><TabsTrigger value="registrar">+ Registrar Bateria</TabsTrigger><TabsTrigger value="historico">Caderno de Erros / Histórico</TabsTrigger></TabsList>
+        <TabsContent value="registrar"><div className="max-w-xl">
         <Panel title="Registrar bateria" icon={Plus}>
           <form className="space-y-2" onSubmit={(e) => {
             e.preventDefault();
@@ -65,18 +74,6 @@ function Questoes() {
           </form>
         </Panel>
 
-        <Panel title="Alerta: abaixo de 70%" icon={AlertTriangle} className="lg:col-span-2">
-          {weak.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum tópico abaixo da meta. Excelente!</p> : (
-            <div className="grid gap-2 sm:grid-cols-2">
-              {weak.map((w) => (
-                <div key={w.sid + w.topic} className="flex items-center justify-between rounded-lg border border-destructive/30 bg-destructive/10 p-3">
-                  <div className="min-w-0"><div className="text-[11px] font-bold text-destructive">{name(w.sid)}</div><div className="truncate text-sm">{w.topic}</div></div>
-                  <span className="tabular text-lg font-bold text-destructive">{pct(w.c, w.t)}%</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </Panel>
 
         <Panel title="Histórico de baterias" icon={Target} className="lg:col-span-2">
           <div className="max-h-[420px] overflow-auto">
@@ -112,7 +109,8 @@ function Questoes() {
             ))}
           </div>
         </Panel>
-      </div>
+        </div></TabsContent>
+      </Tabs>
     </>
   );
 }
